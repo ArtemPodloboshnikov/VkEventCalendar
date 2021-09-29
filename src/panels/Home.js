@@ -1,42 +1,57 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { useEffect, useState, Fragment } from 'react';
+import { View, Panel, Header, PanelHeader, HorizontalScroll, Group, Button, Text, SimpleCell } from '@vkontakte/vkui';
 
-import { Panel, PanelHeader, Header, Button, Group, Cell, Div, Avatar } from '@vkontakte/vkui';
+const Home = () => {
+  const [dateAndData, setDateAndData] = useState({'29.09.2021': ['Круть', 'Я хочу туда попасть'],
+  												  '30.09.2021': ['Круть крутетская!'], 
+												  '31.09.2021': ['Ахуеть'], 
+												  '1.10.2021': [''], 
+												  '2.10.2021': [''], 
+												  '3.10.2021': [''], 
+												  '4.10.2021': [''], 
+												  '5.10.2021': ['']});
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const dates = Object.keys(dateAndData);
+  useEffect(() => {
+    
+  }, []);
 
-const Home = ({ id, go, fetchedUser }) => (
-	<Panel id={id}>
-		<PanelHeader>Example</PanelHeader>
-		{fetchedUser &&
-		<Group header={<Header mode="secondary">User Data Fetched with VK Bridge</Header>}>
-			<Cell
-				before={fetchedUser.photo_200 ? <Avatar src={fetchedUser.photo_200}/> : null}
-				description={fetchedUser.city && fetchedUser.city.title ? fetchedUser.city.title : ''}
-			>
-				{`${fetchedUser.first_name} ${fetchedUser.last_name}`}
-			</Cell>
-		</Group>}
+  return (
+    <View activePanel="horizontal">
+      <Panel id="horizontal">
+        <PanelHeader style={{textAlign: 'center'}}>События</PanelHeader>
+        <Group header={<Header mode="secondary" style={{justifyContent: 'center'}}>Даты</Header>}>
+          <HorizontalScroll showArrows getScrollToLeft={i => i - 120} getScrollToRight={i => i + 120}>
+            <div style={{ display: 'flex', gap: '3%', margin: '3%'}}>
+              {
+				dates.map((item, index) => 
+				  {
+					return (
+						<Button mode={(currentIndex == index)?"primary":"secondary"} onClick={()=>{setCurrentIndex(index)}}>{item}</Button>
+					)
+				  })
+			  }
+            </div>
+          </HorizontalScroll>
+		  {
+			dateAndData[dates[currentIndex]].map((item)=>{
+				console.log(item)
+				return (
 
-		<Group header={<Header mode="secondary">Navigation Example</Header>}>
-			<Div>
-				<Button stretched size="l" mode="secondary" onClick={go} data-to="persik">
-					Show me the Persik, please
-				</Button>
-			</Div>
-		</Group>
-	</Panel>
-);
+					<SimpleCell>
+						<Text>{item}</Text>
+					</SimpleCell>
+				)
+			})
 
-Home.propTypes = {
-	id: PropTypes.string.isRequired,
-	go: PropTypes.func.isRequired,
-	fetchedUser: PropTypes.shape({
-		photo_200: PropTypes.string,
-		first_name: PropTypes.string,
-		last_name: PropTypes.string,
-		city: PropTypes.shape({
-			title: PropTypes.string,
-		}),
-	}),
+		
+
+
+			}
+        </Group>
+      </Panel>
+    </View>
+  );
 };
 
-export default Home;
+export default Home
