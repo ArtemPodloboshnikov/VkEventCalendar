@@ -1,15 +1,7 @@
-import { useEffect, useState, Fragment } from 'react';
-import { View, Panel, Header, PanelHeader, HorizontalScroll, Group, Button, Text, SimpleCell } from '@vkontakte/vkui';
+import { useEffect, useState } from 'react';
+import { View, Panel, Header, HorizontalScroll, Group, Button, Text, Title, SimpleCell } from '@vkontakte/vkui';
 
-const Home = () => {
-  const [dateAndData, setDateAndData] = useState({'29.09.2021': ['Круть', 'Я хочу туда попасть'],
-  												  '30.09.2021': ['Круть крутетская!'], 
-												  '31.09.2021': ['Ахуеть'], 
-												  '1.10.2021': [''], 
-												  '2.10.2021': [''], 
-												  '3.10.2021': [''], 
-												  '4.10.2021': [''], 
-												  '5.10.2021': ['']});
+const Home = ({dateAndData}) => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const dates = Object.keys(dateAndData);
   useEffect(() => {
@@ -19,33 +11,45 @@ const Home = () => {
   return (
     <View activePanel="horizontal">
       <Panel id="horizontal">
-        <PanelHeader style={{textAlign: 'center'}}>События</PanelHeader>
-        <Group header={<Header mode="secondary" style={{justifyContent: 'center'}}>Даты</Header>}>
+        <Group header={<Header mode="primary" style={{justifyContent: 'center'}}>Даты</Header>}>
           <HorizontalScroll showArrows getScrollToLeft={i => i - 120} getScrollToRight={i => i + 120}>
             <div style={{ display: 'flex', gap: '3%', margin: '3%'}}>
               {
-				dates.map((item, index) => 
-				  {
+				dates.map((item, index) => {
 					return (
-						<Button mode={(currentIndex == index)?"primary":"secondary"} onClick={()=>{setCurrentIndex(index)}}>{item}</Button>
+						<Button 
+						mode={(currentIndex == index)?"primary":"secondary"} 
+						onClick={()=>{
+							setCurrentIndex(index);
+						}}>
+							{item}
+						</Button>
 					)
-				  })
+				})
 			  }
             </div>
           </HorizontalScroll>
 		  {
 			dateAndData[dates[currentIndex]].map((item)=>{
+
+				const time = Object.keys(item)[0];
 				console.log(item)
 				return (
 
 					<SimpleCell>
-						<Text>{item}</Text>
+						<Text onClick={(event)=>{
+							const text = event.target.innerHTML
+							var textField = document.createElement('textarea')
+							textField.innerText = text
+							document.body.appendChild(textField)
+							textField.select()
+							document.execCommand('copy')
+							textField.remove()
+
+						}}>{`${time}: ${item[time]}`}</Text>
 					</SimpleCell>
 				)
 			})
-
-		
-
 
 			}
         </Group>

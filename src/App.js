@@ -4,12 +4,14 @@ import { View, ScreenSpinner, AdaptivityProvider, AppRoot } from '@vkontakte/vku
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Home from './panels/Home';
-import Persik from './panels/Persik';
+import ErrorPage from './panels/Error';
 
 const App = () => {
 	const [activePanel, setActivePanel] = useState('home');
-	const [fetchedUser, setUser] = useState(null);
 	const [popout, setPopout] = useState(<ScreenSpinner size='large' />);
+	const [dateAndData, setDateAndData] = useState({'Дата': [{'Время': 'Событие 1'}]});
+	const url_data = 'https://vk-data-keep.herokuapp.com';
+
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data }}) => {
@@ -19,12 +21,29 @@ const App = () => {
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
 		});
-		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
+		async function getData()
+		{
+			try
+			{
+				// throw new Error('Server not found')
+				const data = await fetch(`${url_data}/data/all`);
+				const json = await data.json();
+				console.log(typeof json);
+				setDateAndData(JSON.parse(json));
+				console.log(`${url_data}/data/all`)
+			}
+			catch(error)
+			{
+				setDateAndData({'errors': [{'description': error.message}]});
+				setActivePanel('error');
+
+			}
 			setPopout(null);
+
 		}
-		fetchData();
+
+		getData();
+
 	}, []);
 
 	const go = e => {
@@ -35,8 +54,8 @@ const App = () => {
 		<AdaptivityProvider>
 			<AppRoot>
 				<View activePanel={activePanel} popout={popout}>
-					<Home id='home' fetchedUser={fetchedUser} go={go} />
-					<Persik id='persik' go={go} />
+					<Home id='home' dateAndData={dateAndData}/>
+					<ErrorPage id='error' error={dateAndData}/>
 				</View>
 			</AppRoot>
 		</AdaptivityProvider>
